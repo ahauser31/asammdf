@@ -4631,9 +4631,10 @@ class FileIdentificationBlock:
             version = kwargs.get("version", "4.00")
             self.file_identification = "MDF     ".encode("utf-8")
             self.version_str = "{}    ".format(version).encode("utf-8")
-            self.program_identification = "amdf{}".format(
-                __version__.replace(".", "")
-            ).encode("utf-8")
+            # self.program_identification = "amdf{}".format(
+            #     __version__.replace(".", "")
+            # ).encode("utf-8")
+            self.program_identification = "VDEReAsia_convert_dataV1".encode("utf-8")
             self.reserved0 = b"\0" * 4
             self.mdf_version = int(version.replace(".", ""))
             self.reserved1 = b"\0" * 30
@@ -4814,6 +4815,7 @@ class HeaderBlock:
     * ``department`` - str : author's department
     * ``project`` - str : working project
     * ``subject`` - str : measurement subject
+    * ``common_properties`` - dict : Dictionary with header file meta data
 
     """
 
@@ -4843,6 +4845,7 @@ class HeaderBlock:
         "reserved1",
         "start_angle",
         "start_distance",
+        "common_properties",
     )
 
     def __init__(self, **kwargs):
@@ -4851,6 +4854,8 @@ class HeaderBlock:
         self.comment = ""
 
         self.author = self.project = self.subject = self.department = ""
+
+        self.common_properties = dict()
 
         try:
             self.address = address = kwargs["address"]
@@ -4923,14 +4928,18 @@ class HeaderBlock:
                 if common_properties is not None:
                     for e in common_properties:
                         name = e.get("name")
-                        if name == "author":
-                            self.author = e.text
-                        elif name == "department":
-                            self.department = e.text
-                        elif name == "project":
-                            self.project = e.text
-                        elif name == "subject":
-                            self.subject = e.text
+
+                        # Modified to fit with our requirements
+                        self.common_properties[name] = e.text
+
+                        # if name == "author":
+                        #     self.author = e.text
+                        # elif name == "department":
+                        #     self.department = e.text
+                        # elif name == "project":
+                        #     self.project = e.text
+                        # elif name == "subject":
+                        #     self.subject = e.text
 
     def __getitem__(self, item):
         return self.__getattribute__(item)
@@ -4976,74 +4985,141 @@ class HeaderBlock:
         self.address = address
         address += self.block_len
 
+        # Init comment block
+        if not self.comment.startswith("<HDcomment"):
+            self.comment = """<HDcomment>
+            <TX></TX>
+            <common_properties>
+                <e name="Internal_DUT_ID"></e>
+                <e name="Manufacturer"></e>
+                <e name="Cell_Type"></e>
+                <e name="Capa_Nom"></e>
+                <e name="Cell_Configuration"></e>
+                <e name="Project"></e>
+                <e name="Sample"></e>
+                <e name="Test_Type"></e>
+                <e name="Lane_Nr"></e>
+                <e name="Testgroup_Nr"></e>
+                <e name="Testgroup_Name"></e>
+                <e name="TLP_Order_ID"></e>
+                <e name="TLP_Test_ID"></e>
+                <e name="Test_Spec_Version"></e>
+                <e name="Test_Category"></e>
+                <e name="Test_ID"></e>
+                <e name="Test_Par_Set"></e>
+                <e name="Software_Version"></e>
+                <e name="PAM_Version"></e>
+                <e name="Test_Institute"></e>
+                <e name="Test_LV_Voltage"></e>
+                <e name="Test_Temperature"></e>
+                <e name="Test_Bench"></e>
+                <e name="Test_Plan"></e>
+                <e name="Operator"></e>
+                <e name="AUSY_Par_File_1"></e>
+                <e name="AUSY_Par_File_2"></e>
+                <e name="AUSY_Par_File_3"></e>
+                <e name="AUSY_Par_File_4"></e>
+                <e name="AUSY_Par_File_5"></e>
+            </common_properties>
+            </HDcomment>"""
+        #end if
+
         if self.comment.startswith("<HDcomment"):
             comment = self.comment
             comment = ET.fromstring(comment)
             common_properties = comment.find(".//common_properties")
             if common_properties is not None:
-                for e in common_properties:
-                    name = e.get("name")
-                    if name == "author":
-                        e.text = self.author
-                        break
-                else:
-                    author = ET.SubElement(
-                        common_properties, "e", name="author"
-                    ).text = self.author
 
-                for e in common_properties:
-                    name = e.get("name")
-                    if name == "department":
-                        e.text = self.department
-                        break
-                else:
-                    department = ET.SubElement(
-                        common_properties, "e", name="department"
-                    ).text = self.department
+                 # Changes to our requirements
+                for key in self.common_properties:
+                    foundKey = False
 
-                for e in common_properties:
-                    name = e.get("name")
-                    if name == "project":
-                        e.text = self.author
-                        break
-                else:
-                    project = ET.SubElement(
-                        common_properties, "e", name="project"
-                    ).text = self.project
+                    for e in common_properties:
+                        name = e.get("name")
 
-                for e in common_properties:
-                    name = e.get("name")
-                    if name == "subject":
-                        e.text = self.author
-                        break
-                else:
-                    subject = ET.SubElement(
-                        common_properties, "e", name="subject"
-                    ).text = self.subject
+                        if key == name:
+                            e.text = self.common_properties[key]
+                            foundKey = True
+                            break
+                        #end if
+                    #end for
+
+                    if not foundKey:
+                        ET.SubElement(common_properties, "e", name=key).text = self.common_properties[key]
+                    #end if
+                #end for
+
+                # for e in common_properties:
+                #     name = e.get("name")
+                #     if name == "author":
+                #         e.text = self.author
+                #         break
+                # else:
+                #     author = ET.SubElement(
+                #         common_properties, "e", name="author"
+                #     ).text = self.author
+                #
+                # for e in common_properties:
+                #     name = e.get("name")
+                #     if name == "department":
+                #         e.text = self.department
+                #         break
+                # else:
+                #     department = ET.SubElement(
+                #         common_properties, "e", name="department"
+                #     ).text = self.department
+                #
+                # for e in common_properties:
+                #     name = e.get("name")
+                #     if name == "project":
+                #         e.text = self.author
+                #         break
+                # else:
+                #     project = ET.SubElement(
+                #         common_properties, "e", name="project"
+                #     ).text = self.project
+                #
+                # for e in common_properties:
+                #     name = e.get("name")
+                #     if name == "subject":
+                #         e.text = self.author
+                #         break
+                # else:
+                #     subject = ET.SubElement(
+                #         common_properties, "e", name="subject"
+                #     ).text = self.subject
 
             else:
                 common_properties = ET.SubElement(comment, "common_properties")
-                author = ET.SubElement(
-                    common_properties, "e", name="author"
-                ).text = self.author
-                department = ET.SubElement(
-                    common_properties, "e", name="department"
-                ).text = self.department
-                project = ET.SubElement(
-                    common_properties, "e", name="project"
-                ).text = self.project
-                subject = ET.SubElement(
-                    common_properties, "e", name="subject"
-                ).text = self.subject
+
+                 # Changed to our requirements
+                for key in self.common_properties:
+                    ET.SubElement(common_properties, "e", name=key).text = self.common_properties[key]
+                #end for
+
+                # author = ET.SubElement(
+                #     common_properties, "e", name="author"
+                # ).text = self.author
+                # department = ET.SubElement(
+                #     common_properties, "e", name="department"
+                # ).text = self.department
+                # project = ET.SubElement(
+                #     common_properties, "e", name="project"
+                # ).text = self.project
+                # subject = ET.SubElement(
+                #     common_properties, "e", name="subject"
+                # ).text = self.subject
+            #end if
 
             comment = ET.tostring(comment, encoding="utf8", method="xml").replace(
                 b"<?xml version='1.0' encoding='utf8'?>\n", b""
             )
+        #end if
 
-        else:
-            comment = v4c.HD_COMMENT_TEMPLATE.format(
-                self.comment, self.author, self.department, self.project, self.subject
-            )
+        # else:
+        #     comment = v4c.HD_COMMENT_TEMPLATE.format(
+        #         self.comment, self.author, self.department, self.project, self.subject
+        #     )
 
         tx_block = TextBlock(text=comment, meta=True)
         self.comment_addr = address

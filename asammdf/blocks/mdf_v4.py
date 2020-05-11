@@ -5660,9 +5660,9 @@ class MDF4(object):
             fh = FileHistory()
             fh.comment = """<FHcomment>
 <TX>Added new embedded attachment from {}</TX>
-<tool_id>asammdf</tool_id>
-<tool_vendor>asammdf</tool_vendor>
-<tool_version>{}</tool_version>
+<tool_id>convert_data</tool_id>
+<tool_vendor>VDE RE</tool_vendor>
+<tool_version>1.1</tool_version>
 </FHcomment>""".format(
                 file_name if file_name else "bin.bin", __version__
             )
@@ -8175,16 +8175,16 @@ class MDF4(object):
             dst_ = open(destination, "wb+")
 
         if not self.file_history:
-            comment = "created"
+            comment = "Initial version"
         else:
-            comment = "updated"
+            comment = "Modified version"
 
         fh = FileHistory()
         fh.comment = f"""<FHcomment>
 <TX>{comment}</TX>
-<tool_id>asammdf</tool_id>
-<tool_vendor>asammdf</tool_vendor>
-<tool_version>{__version__}</tool_version>
+<tool_id>convert_data</tool_id>
+<tool_vendor>VDE RE</tool_vendor>
+<tool_version>1.0</tool_version>
 </FHcomment>"""
 
         self.file_history.append(fh)
