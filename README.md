@@ -17,14 +17,16 @@
 
 # Status
 
-! | Travis CI  | Appveyor | CoverAlls  |  Codacy  | ReadTheDocs 
+! | Travis CI  | Appveyor | CoverAlls  |  Codacy  | ReadTheDocs
 --|--|--|--|--|--
-master | [![Build Status](https://travis-ci.org/danielhrisca/asammdf.svg?branch=)](https://travis-ci.org/danielhrisca/asammdf) | [![Build status](https://ci.appveyor.com/api/projects/status/racx048r4cnwa2lg/branch/master?svg=true)](https://ci.appveyor.com/project/danielhrisca/asammdf/branch/master) | [![Coverage Status](https://coveralls.io/repos/github/danielhrisca/asammdf/badge.svg?branch=master)](https://coveralls.io/github/danielhrisca/asammdf?branch=master) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3da21da90ca43a5b72fc24b56880c99?branch=master)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=badger) |  [![Documentation Status](http://readthedocs.org/projects/asammdf/badge/?version=master)](http://asammdf.readthedocs.io/en/master/?badge=stable) | 
+master | [![Build Status](https://travis-ci.org/danielhrisca/asammdf.svg?branch=)](https://travis-ci.org/danielhrisca/asammdf) | [![Build status](https://ci.appveyor.com/api/projects/status/racx048r4cnwa2lg/branch/master?svg=true)](https://ci.appveyor.com/project/danielhrisca/asammdf/branch/master) | [![Coverage Status](https://coveralls.io/repos/github/danielhrisca/asammdf/badge.svg?branch=master)](https://coveralls.io/github/danielhrisca/asammdf?branch=master) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3da21da90ca43a5b72fc24b56880c99?branch=master)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=badger) |  [![Documentation Status](http://readthedocs.org/projects/asammdf/badge/?version=master)](http://asammdf.readthedocs.io/en/master/?badge=stable) |
 
 PyPI| conda-forge
 --|--
 [![PyPI version](https://badge.fury.io/py/asammdf.svg)](https://badge.fury.io/py/asammdf)  | [![conda-forge version](https://anaconda.org/conda-forge/asammdf/badges/version.svg)](https://anaconda.org/conda-forge/asammdf)
 
+# Note
+This forked version has adaptions in the metadata block of the MDF file header, based on our requirements
 
 # Project goals
 The main goals for this library are:
@@ -157,7 +159,7 @@ Thanks to all who contributed with commits to *asammdf*:
 
 ```shell
 pip install asammdf
-# for the GUI 
+# for the GUI
 pip install asammdf[gui]
 # or for anaconda
 conda install -c conda-forge asammdf
